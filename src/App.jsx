@@ -48,25 +48,35 @@ function App() {
   };
 
   const handleRegister = async () => {
-    setFeedback('');
-    try {
-      const response = await fetch(`${API_BASE_URL}/users/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password }),
-      });
-      const data = await response.json();
-      setFeedback(data.message);
-      if (data.message.includes('successful')) {
-        setUsername('');
-        setPassword('');
-        setCurrentPage('login');
-      }
-    } catch (error) {
-      setFeedback('Error during registration. Please try again.');
-    }
-  };
+  setFeedback('');
+  try {
+    const response = await fetch(`${API_BASE_URL}/users/register`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({ 
+        username: username,
+        password: password 
+      })
+    });
 
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Registration failed');
+    }
+
+    const data = await response.json();
+    setFeedback(data.message || 'Registration successful!');
+    setUsername('');
+    setPassword('');
+    setCurrentPage('login');
+  } catch (error) {
+    console.error('Registration error:', error);
+    setFeedback(error.message || 'Error during registration. Please try again.');
+  }
+};
   const handleLogin = async () => {
     setFeedback('');
     try {
